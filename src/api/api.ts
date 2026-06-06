@@ -2,7 +2,7 @@ import axios from "axios";
 import type { ApiResponse, LoginResponse } from "../types";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:8080/api",
+  baseURL: import.meta.env.VITE_BACKEND_URL ,
   headers: { "Content-Type": "application/json" },
 });
 
