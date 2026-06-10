@@ -2,11 +2,11 @@ import axios from "axios";
 import type { ApiResponse, LoginResponse } from "../types";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL ,
+  //baseURL: import.meta.env.VITE_BACKEND_URL ,
+  baseURL: "http://localhost:8080/api",
   headers: { "Content-Type": "application/json" },
 });
 
-console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);  
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");

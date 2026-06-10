@@ -186,7 +186,6 @@ function EyeIcon({ open }) {
 }
 
 export default function Register() {
-  // ✅ FIX: State matches backend DTO — firstName + lastName instead of single "name"
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -213,7 +212,6 @@ export default function Register() {
     }
   };
 
-  // ✅ FIX: Validation matches actual form fields — firstName & lastName
   const validate = () => {
     const e = {};
 
@@ -250,20 +248,21 @@ export default function Register() {
       return;
     }
 
+    // Payload declared here so it's accessible in the catch block for logging
+    const payload = {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      password: form.password,
+    };
+
     try {
       setLoading(true);
 
-      // ✅ FIX: Sends firstName + lastName separately, matching RegisterRequest DTO
-      await API.post("/auth/register", {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        password: form.password,
-      });
+      await API.post("/auth/register", payload);
 
       setStep(2);
 
-      // ✅ FIX: Reset includes all actual fields
       setForm({
         firstName: "",
         lastName: "",
@@ -272,6 +271,9 @@ export default function Register() {
         confirm: "",
       });
     } catch (error) {
+      console.log("Status:", error.response?.status);
+      console.log("Message:", error.response?.data);
+      console.log("Sent Data:", payload); // ✅ FIXED: was `data` (undefined) → now `payload`
       console.error(error);
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
@@ -350,7 +352,6 @@ export default function Register() {
             Account Created!
           </h2>
 
-          {/* ✅ FIX: Was form.name (undefined) — now correctly uses form.firstName */}
           <p
             style={{
               color: "rgba(255,255,255,0.4)",
@@ -429,9 +430,8 @@ export default function Register() {
           Create Account
         </h1>
 
-        {/* ✅ FIX: Split into firstName + lastName — two separate inputs */}
+        {/* First Name + Last Name */}
         <div style={{ display: "flex", gap: "12px", marginBottom: "14px" }}>
-          {/* First Name */}
           <div style={{ flex: 1 }}>
             <div style={{ position: "relative" }}>
               <IconUser color={iconColor("firstName")} />
@@ -453,7 +453,6 @@ export default function Register() {
             )}
           </div>
 
-          {/* Last Name */}
           <div style={{ flex: 1 }}>
             <div style={{ position: "relative" }}>
               <IconUser color={iconColor("lastName")} />
