@@ -1,6 +1,7 @@
 import { LogOut, X, ChevronRight } from "lucide-react";
 import { roleMenus, roleColors } from "../../utils/roleConfig";
 import type { Role, User } from "../../types";
+import { Link } from "react-router-dom";
 
 interface SidebarProps {
   user: User | null;
@@ -31,9 +32,11 @@ export default function Sidebar({
             <span className="text-white font-bold text-sm">MC</span>
           </div>
           <div>
-            <p className="text-sm font-bold text-gray-900 leading-none">
-              MediClinic
-            </p>
+            <Link to="/" className="text-sm font-bold text-gray-900">
+              <p className="text-sm font-bold text-gray-900 leading-none">
+                MediClinic
+              </p>
+            </Link>
             <p className="text-[10px] text-gray-400">Healthcare Portal</p>
           </div>
         </div>
