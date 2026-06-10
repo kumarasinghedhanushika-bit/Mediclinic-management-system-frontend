@@ -52,7 +52,7 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${BACKEND_URL}/api/auth/oauth2/authorize/google`;
+    window.location.href = `${BACKEND_URL}/auth/oauth2/authorize/google`;
   };
 
   return (
