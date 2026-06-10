@@ -16,7 +16,7 @@ import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../services/api";
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ;
 
 // ── Password strength ──────────────────────────────────────────────────────
 function StrengthBar({ password }: { password: string }) {

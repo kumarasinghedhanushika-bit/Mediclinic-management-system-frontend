@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ;
 
 const features = [
   { icon: <HiOutlineBellAlert className="w-4 h-4" />, label: "Smart reminders", color: "bg-sky-500/20 text-sky-400" },
