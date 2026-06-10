@@ -159,7 +159,7 @@ export default function Register() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${BACKEND_URL}/api/auth/oauth2/authorize/google`;
+    window.location.href = `${BACKEND_URL}/auth/oauth2/authorize/google`;
   };
 
   if (success) return <SuccessScreen />;
