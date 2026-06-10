@@ -11,6 +11,7 @@ import VerifyEmail from "../pages/VerifyEmail";
 import Dashboard from "../pages/Dashboard";
 import PaymentSuccess from "../pages/payment/PaymentSuccess";
 import PaymentCancel from "../pages/payment/PaymentCancel";
+import OAuth2CallbackPage from "../pages/OAuth2CallbackPage";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
       { path: "/payment/success", element: <PaymentSuccess /> },
       { path: "/payment/cancel", element: <PaymentCancel /> },
       { path: "/verify-email", element: <VerifyEmail /> },
+      { path: "/oauth2/callback", element: <OAuth2CallbackPage /> }
     ],
   },
   {
