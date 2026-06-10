@@ -164,9 +164,8 @@ export default function Register() {
 
   if (success) return <SuccessScreen />;
 
-  const inputClass = (field: string) =>
-    `w-full h-[48px] pl-10 pr-4 bg-transparent text-white text-sm placeholder-white/25 outline-none rounded-xl transition-all duration-200`;
-
+const inputClass = (_field: string) =>
+  `w-full h-[48px] pl-10 pr-4 bg-transparent text-white text-sm placeholder-white/25 outline-none rounded-xl transition-all duration-200`;
   const wrapClass = (field: string) =>
     `relative flex items-center rounded-xl border transition-all duration-200 ${
       errors[field]
