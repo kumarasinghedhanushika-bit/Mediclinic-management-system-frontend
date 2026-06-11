@@ -15,6 +15,7 @@ import OAuth2CallbackPage from "../pages/OAuth2CallbackPage";
 import AboutUs from "../pages/aboutus";
 
 
+
 const router = createBrowserRouter([
   {
     element: <PublicLayout />,
@@ -31,6 +32,8 @@ const router = createBrowserRouter([
       { path: "/verify-email", element: <VerifyEmail /> },
       { path: "/oauth2/callback", element: <OAuth2CallbackPage /> },
       { path: "/aboutus", element: <AboutUs /> }
+    
+
     ],
   },
   {

@@ -493,7 +493,7 @@ export default function HomePage() {
             boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
           }}
         >
-          Start channeling
+          Booking Appointment
         </button>
       </section>
 

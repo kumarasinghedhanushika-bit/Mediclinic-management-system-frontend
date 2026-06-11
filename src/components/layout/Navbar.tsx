@@ -24,11 +24,11 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-teal-500/25">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br  to-cyan-500 flex items-center justify-center shadow-lg shadow-teal-500/25">
               <Activity className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-slate-900 text-lg tracking-tight">
-              Medi<span className="text-teal-600">Clinic</span>
+            <span className="font-bold text-[#88CDF6] text-lg tracking-tight">
+              Medi<span className="text-[#015C92]">Clinic</span>
             </span>
           </Link>
 
@@ -37,7 +37,7 @@ export default function Navbar() {
               <Link
                 key={l.to}
                 to={l.to}
-                className="text-sm font-medium text-slate-600 hover:text-teal-600 transition-colors"
+                className="text-sm font-medium text-slate-600 hover:text-[ #3FB8D0] transition-colors"
               >
                 {l.label}
               </Link>
@@ -67,13 +67,13 @@ export default function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-teal-600 transition"
+                  className="px-4 py-2 text-sm font-semibold text-white bg-[#105e8c93] rounded-lg hover:bg-[#154b69] shadow-md shadow-[#53A7D8]/25 transition"
                 >
                   Sign in
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2 text-sm font-semibold text-white bg-teal-600 rounded-lg hover:bg-teal-700 shadow-md shadow-teal-600/25 transition"
+                  className="px-4 py-2 text-sm font-semibold text-white bg-[#135982] rounded-lg hover:bg-[#9bd2f3] shadow-md shadow-[#88C9EF]/30 transition"
                 >
                   Register
                 </Link>

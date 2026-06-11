@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Search, Stethoscope, Calendar, Clock } from "lucide-react";
+import { Search, Stethoscope, Calendar, Clock, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
 import { publicService } from "../api";
 import type { Department, Doctor, TimeSlot } from "../types";
@@ -67,149 +67,641 @@ export default function ChannelingPage() {
   const today = new Date().toISOString().split("T")[0];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
-          <Stethoscope className="text-teal-600" />
-          Doctor channeling
-        </h1>
-        <p className="text-slate-500 mt-1">
-          Browse doctors, check availability, and book your visit
-        </p>
-      </div>
+    <>
+      <style>{`
+        .chan-page {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #020b18 0%, #041225 40%, #061a35 70%, #0a2347 100%);
+          position: relative;
+          overflow: hidden;
+        }
+        .chan-page::before {
+          content: '';
+          position: fixed;
+          inset: 0;
+          background:
+            radial-gradient(ellipse 60% 40% at 20% 30%, rgba(0,120,255,0.18) 0%, transparent 60%),
+            radial-gradient(ellipse 50% 35% at 80% 70%, rgba(0,200,180,0.12) 0%, transparent 55%),
+            radial-gradient(ellipse 40% 30% at 60% 10%, rgba(30,80,200,0.15) 0%, transparent 50%);
+          pointer-events: none;
+          z-index: 0;
+        }
+        .chan-content {
+          position: relative;
+          z-index: 1;
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 2.5rem 1.5rem 4rem;
+        }
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Filters */}
-        <aside className="lg:w-72 space-y-4 flex-shrink-0">
-          <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
-            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              Department
-            </label>
-            <select
-              value={departmentId}
-              onChange={(e) => setDepartmentId(e.target.value)}
-              className="mt-2 w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
-            >
-              <option value="">All departments</option>
-              {departments.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm relative">
-            <Search
-              className="absolute left-7 top-1/2 -translate-y-1/2 text-slate-400"
-              size={16}
-            />
-            <input
-              placeholder="Search doctor or specialty…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none"
-            />
-          </div>
-        </aside>
+        /* Grid dots overlay */
+        .chan-page::after {
+          content: '';
+          position: fixed;
+          inset: 0;
+          background-image: radial-gradient(circle, rgba(0,150,255,0.08) 1px, transparent 1px);
+          background-size: 36px 36px;
+          pointer-events: none;
+          z-index: 0;
+        }
 
-        {/* Doctor list */}
-        <div className="flex-1 grid md:grid-cols-2 gap-4 content-start">
-          {filtered.length === 0 ? (
-            <p className="col-span-2 text-center text-slate-400 py-12">
-              No doctors found
+        /* Header */
+        .chan-header {
+          margin-bottom: 2.5rem;
+        }
+        .chan-header-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(0,140,255,0.15);
+          border: 1px solid rgba(0,180,255,0.3);
+          border-radius: 999px;
+          padding: 4px 14px;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #5ecfff;
+          margin-bottom: 0.75rem;
+        }
+        .chan-title {
+          font-size: 2.25rem;
+          font-weight: 700;
+          color: #fff;
+          letter-spacing: -0.02em;
+          line-height: 1.15;
+          text-shadow: 0 0 40px rgba(0,160,255,0.4);
+        }
+        .chan-title span {
+          background: linear-gradient(90deg, #00d4ff, #0088ff);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .chan-subtitle {
+          color: rgba(160,200,240,0.7);
+          margin-top: 0.4rem;
+          font-size: 0.95rem;
+        }
+
+        /* Glass card base */
+        .glass-card {
+          background: rgba(5,25,60,0.55);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(0,150,255,0.2);
+          border-radius: 16px;
+          box-shadow:
+            0 4px 24px rgba(0,0,0,0.4),
+            inset 0 1px 0 rgba(255,255,255,0.06);
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        /* Filters sidebar */
+        .chan-filters {
+          width: 280px;
+          flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .filter-label {
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #5ecfff;
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .filter-label::before {
+          content: '';
+          display: inline-block;
+          width: 3px;
+          height: 10px;
+          background: linear-gradient(180deg, #00d4ff, #0055ff);
+          border-radius: 2px;
+        }
+        .chan-select {
+          width: 100%;
+          padding: 10px 36px 10px 12px;
+          background: rgba(0,30,80,0.6);
+          border: 1px solid rgba(0,150,255,0.25);
+          border-radius: 10px;
+          color: #cce4ff;
+          font-size: 14px;
+          appearance: none;
+          -webkit-appearance: none;
+          cursor: pointer;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+        .chan-select:focus {
+          border-color: rgba(0,200,255,0.6);
+          box-shadow: 0 0 0 3px rgba(0,150,255,0.15);
+        }
+        .select-wrap {
+          position: relative;
+        }
+        .select-wrap .select-icon {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #5ecfff;
+          pointer-events: none;
+        }
+        .chan-search-input {
+          width: 100%;
+          padding: 10px 12px 10px 38px;
+          background: rgba(0,30,80,0.6);
+          border: 1px solid rgba(0,150,255,0.25);
+          border-radius: 10px;
+          color: #cce4ff;
+          font-size: 14px;
+          outline: none;
+          transition: border-color 0.2s;
+          box-sizing: border-box;
+        }
+        .chan-search-input::placeholder { color: rgba(140,180,230,0.4); }
+        .chan-search-input:focus {
+          border-color: rgba(0,200,255,0.6);
+          box-shadow: 0 0 0 3px rgba(0,150,255,0.15);
+        }
+        .search-wrap {
+          position: relative;
+        }
+        .search-icon {
+          position: absolute;
+          left: 11px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #5ecfff;
+          pointer-events: none;
+        }
+
+        /* Doctor cards */
+        .doctor-grid {
+          flex: 1;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 16px;
+          align-content: start;
+        }
+        .doctor-card {
+          padding: 20px;
+          cursor: default;
+          position: relative;
+          overflow: hidden;
+        }
+        .doctor-card::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(0,200,255,0.5), transparent);
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+        .doctor-card:hover::before,
+        .doctor-card.selected::before {
+          opacity: 1;
+        }
+        .doctor-card.selected {
+          border-color: rgba(0,200,255,0.5);
+          box-shadow:
+            0 4px 32px rgba(0,150,255,0.25),
+            inset 0 1px 0 rgba(255,255,255,0.08),
+            0 0 0 1px rgba(0,200,255,0.15);
+        }
+        .doctor-card:hover:not(.selected) {
+          border-color: rgba(0,150,255,0.4);
+        }
+        .doc-avatar {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, rgba(0,100,200,0.5), rgba(0,200,255,0.3));
+          border: 2px solid rgba(0,200,255,0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 700;
+          font-size: 16px;
+          color: #00d4ff;
+          flex-shrink: 0;
+          box-shadow: 0 0 16px rgba(0,180,255,0.3);
+          text-shadow: 0 0 8px rgba(0,220,255,0.6);
+        }
+        .doc-name {
+          font-weight: 600;
+          font-size: 15px;
+          color: #e8f4ff;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .doc-spec {
+          font-size: 13px;
+          color: #00c8ff;
+          margin-top: 2px;
+        }
+        .doc-dept {
+          font-size: 11px;
+          color: rgba(140,180,230,0.55);
+          margin-top: 2px;
+        }
+        .doc-fee {
+          font-size: 14px;
+          font-weight: 600;
+          color: #5ecfff;
+          margin-top: 10px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .doc-fee-label {
+          font-size: 11px;
+          color: rgba(120,170,220,0.5);
+          font-weight: 400;
+        }
+
+        /* Date input area */
+        .availability-label {
+          font-size: 11px;
+          color: rgba(140,180,230,0.6);
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          margin-top: 14px;
+          margin-bottom: 6px;
+        }
+        .chan-date-input {
+          width: 100%;
+          padding: 9px 12px;
+          background: rgba(0,20,60,0.7);
+          border: 1px solid rgba(0,150,255,0.2);
+          border-radius: 8px;
+          color: #b0d4f5;
+          font-size: 13px;
+          outline: none;
+          cursor: pointer;
+          transition: border-color 0.2s;
+          box-sizing: border-box;
+          color-scheme: dark;
+        }
+        .chan-date-input:focus {
+          border-color: rgba(0,200,255,0.5);
+        }
+
+        /* Slot panel */
+        .slot-panel {
+          width: 300px;
+          flex-shrink: 0;
+          padding: 20px;
+          position: sticky;
+          top: 24px;
+          height: fit-content;
+        }
+        .slot-panel-header {
+          margin-bottom: 16px;
+          padding-bottom: 14px;
+          border-bottom: 1px solid rgba(0,150,255,0.15);
+        }
+        .slot-panel-name {
+          font-size: 15px;
+          font-weight: 600;
+          color: #e8f4ff;
+        }
+        .slot-panel-date {
+          font-size: 12px;
+          color: #5ecfff;
+          margin-top: 4px;
+        }
+        .slot-section-title {
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: rgba(100,160,220,0.6);
+          margin-bottom: 10px;
+        }
+        .slots-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+        }
+        .slot-btn {
+          padding: 8px 4px;
+          font-size: 11px;
+          font-weight: 500;
+          border-radius: 8px;
+          border: 1px solid rgba(0,150,255,0.25);
+          background: rgba(0,30,80,0.5);
+          color: #90c0e8;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 3px;
+          transition: all 0.15s;
+        }
+        .slot-btn:hover:not(:disabled) {
+          border-color: rgba(0,200,255,0.5);
+          background: rgba(0,60,140,0.5);
+          color: #00d4ff;
+        }
+        .slot-btn.active {
+          background: linear-gradient(135deg, #0066cc, #00a8e8);
+          border-color: #00c8ff;
+          color: #fff;
+          box-shadow: 0 0 12px rgba(0,180,255,0.4);
+        }
+        .slot-btn:disabled {
+          background: rgba(0,20,50,0.3);
+          border-color: rgba(0,80,150,0.1);
+          color: rgba(80,120,170,0.35);
+          cursor: not-allowed;
+        }
+        .book-btn {
+          width: 100%;
+          margin-top: 16px;
+          padding: 12px;
+          background: linear-gradient(135deg, #0055cc 0%, #0099dd 100%);
+          color: #fff;
+          font-size: 14px;
+          font-weight: 600;
+          border: none;
+          border-radius: 10px;
+          cursor: pointer;
+          letter-spacing: 0.02em;
+          transition: opacity 0.2s, box-shadow 0.2s;
+          box-shadow: 0 4px 20px rgba(0,100,220,0.4);
+          position: relative;
+          overflow: hidden;
+        }
+        .book-btn::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+          pointer-events: none;
+        }
+        .book-btn:hover {
+          opacity: 0.92;
+          box-shadow: 0 6px 28px rgba(0,120,255,0.55);
+        }
+        .register-hint {
+          text-align: center;
+          margin-top: 12px;
+          font-size: 12px;
+          color: rgba(120,170,220,0.5);
+        }
+        .register-hint a {
+          color: #00c8ff;
+          text-decoration: none;
+        }
+        .register-hint a:hover { text-decoration: underline; }
+
+        /* Glow orbs decorative */
+        .orb {
+          position: fixed;
+          border-radius: 50%;
+          pointer-events: none;
+          z-index: 0;
+          filter: blur(80px);
+          opacity: 0.25;
+        }
+        .orb-1 {
+          width: 400px; height: 400px;
+          background: radial-gradient(circle, #0066ff, transparent 70%);
+          top: -100px; left: -100px;
+        }
+        .orb-2 {
+          width: 300px; height: 300px;
+          background: radial-gradient(circle, #00c8aa, transparent 70%);
+          bottom: 5%; right: 5%;
+        }
+        .orb-3 {
+          width: 250px; height: 250px;
+          background: radial-gradient(circle, #0044cc, transparent 70%);
+          top: 40%; left: 50%;
+        }
+
+        /* Empty state */
+        .empty-state {
+          grid-column: 1/-1;
+          text-align: center;
+          padding: 60px 20px;
+          color: rgba(120,170,220,0.4);
+          font-size: 15px;
+        }
+
+        /* Loading text */
+        .loading-text {
+          text-align: center;
+          padding: 32px;
+          color: rgba(140,190,240,0.5);
+          font-size: 14px;
+        }
+
+        /* Divider line decoration in slot panel */
+        .slot-divider {
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(0,180,255,0.3), transparent);
+          margin: 14px 0;
+        }
+
+        @media (max-width: 1024px) {
+          .chan-layout { flex-direction: column; }
+          .chan-filters { width: 100%; }
+          .slot-panel { width: 100%; position: static; }
+        }
+      `}</style>
+
+      <div className="chan-page">
+        {/* Decorative orbs */}
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+        <div className="orb orb-3" />
+
+        <div className="chan-content">
+          {/* Header */}
+          <div className="chan-header">
+            <div className="chan-header-badge">
+              <Stethoscope size={12} />
+              Medical Services
+            </div>
+            <h1 className="chan-title">
+              Doctor <span>Channeling</span>
+            </h1>
+            <p className="chan-subtitle">
+              Browse specialists, check availability and book your visit
             </p>
-          ) : (
-            filtered.map((d) => (
-              <div
-                key={d.id}
-                className={`bg-white rounded-xl border p-5 shadow-sm transition ${
-                  selectedDoctor?.id === d.id
-                    ? "border-teal-400 ring-2 ring-teal-100"
-                    : "border-slate-100 hover:border-teal-200"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-lg flex-shrink-0">
-                    {doctorLabel(d).charAt(3) || "D"}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-slate-900 truncate">
-                      {doctorLabel(d)}
-                    </h3>
-                    <p className="text-sm text-teal-600">{d.specialization}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {d.departmentName}
-                    </p>
-                    <p className="text-sm font-medium text-slate-700 mt-2">
-                      LKR {d.consultationFee?.toFixed(2) ?? "—"}
-                    </p>
-                  </div>
+          </div>
+
+          {/* Main layout */}
+          <div className="chan-layout" style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+
+            {/* Filters */}
+            <aside className="chan-filters">
+              <div className="glass-card" style={{ padding: "18px" }}>
+                <div className="filter-label">Department</div>
+                <div className="select-wrap">
+                  <select
+                    value={departmentId}
+                    onChange={(e) => setDepartmentId(e.target.value)}
+                    className="chan-select"
+                  >
+                    <option value="">All departments</option>
+                    {departments.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={14} className="select-icon" />
                 </div>
-                <div className="mt-4">
-                  <label className="text-xs text-slate-500 flex items-center gap-1 mb-1">
-                    <Calendar size={12} /> Check availability
-                  </label>
+              </div>
+
+              <div className="glass-card" style={{ padding: "18px" }}>
+                <div className="filter-label">Search</div>
+                <div className="search-wrap">
+                  <Search size={14} className="search-icon" />
                   <input
-                    type="date"
-                    min={today}
-                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg"
-                    onChange={(e) => loadSlots(d, e.target.value)}
+                    placeholder="Doctor or specialty…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="chan-search-input"
                   />
                 </div>
               </div>
-            ))
-          )}
-        </div>
 
-        {/* Slot panel */}
-        {selectedDoctor && date && (
-          <aside className="lg:w-80 bg-white rounded-xl border border-slate-100 p-5 shadow-sm h-fit sticky top-24">
-            <h3 className="font-semibold text-slate-900">{doctorLabel(selectedDoctor)}</h3>
-            <p className="text-sm text-slate-500 mt-1">{date}</p>
-            {loadingSlots ? (
-              <p className="text-sm text-slate-400 py-6 text-center">Loading slots…</p>
-            ) : slots.length === 0 ? (
-              <p className="text-sm text-slate-400 py-6 text-center">No slots available</p>
-            ) : (
-              <div className="grid grid-cols-3 gap-2 mt-4">
-                {slots.map((s) => (
-                  <button
-                    key={s.time}
-                    disabled={!s.available}
-                    onClick={() => setSelectedTime(s.time)}
-                    className={`px-2 py-1.5 text-xs rounded-lg border font-medium transition ${
-                      selectedTime === s.time
-                        ? "bg-teal-600 text-white border-teal-600"
-                        : s.available
-                          ? "bg-white border-slate-200 hover:border-teal-400"
-                          : "bg-slate-50 text-slate-300 cursor-not-allowed"
-                    }`}
-                  >
-                    <Clock size={10} className="inline mr-0.5" />
-                    {s.time}
-                  </button>
-                ))}
+              {/* Stats decoration */}
+              <div className="glass-card" style={{ padding: "16px 18px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ textAlign: "center", flex: 1 }}>
+                    <div style={{ fontSize: "22px", fontWeight: 700, color: "#00d4ff", textShadow: "0 0 12px rgba(0,200,255,0.5)" }}>
+                      {doctors.length}
+                    </div>
+                    <div style={{ fontSize: "10px", color: "rgba(140,180,230,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 2 }}>Doctors</div>
+                  </div>
+                  <div style={{ width: 1, height: 36, background: "rgba(0,150,255,0.2)" }} />
+                  <div style={{ textAlign: "center", flex: 1 }}>
+                    <div style={{ fontSize: "22px", fontWeight: 700, color: "#5ecfff", textShadow: "0 0 12px rgba(0,180,255,0.4)" }}>
+                      {departments.length}
+                    </div>
+                    <div style={{ fontSize: "10px", color: "rgba(140,180,230,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 2 }}>Depts</div>
+                  </div>
+                  <div style={{ width: 1, height: 36, background: "rgba(0,150,255,0.2)" }} />
+                  <div style={{ textAlign: "center", flex: 1 }}>
+                    <div style={{ fontSize: "22px", fontWeight: 700, color: "#80e8c8", textShadow: "0 0 12px rgba(0,220,180,0.4)" }}>
+                      {filtered.length}
+                    </div>
+                    <div style={{ fontSize: "10px", color: "rgba(140,180,230,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 2 }}>Results</div>
+                  </div>
+                </div>
               </div>
+            </aside>
+
+            {/* Doctor cards */}
+            <div className="doctor-grid">
+              {filtered.length === 0 ? (
+                <div className="empty-state">No doctors found</div>
+              ) : (
+                filtered.map((d) => (
+                  <div
+                    key={d.id}
+                    className={`glass-card doctor-card ${selectedDoctor?.id === d.id ? "selected" : ""}`}
+                  >
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                      <div className="doc-avatar">
+                        {doctorLabel(d).charAt(3) || "D"}
+                      </div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div className="doc-name">{doctorLabel(d)}</div>
+                        <div className="doc-spec">{d.specialization}</div>
+                        <div className="doc-dept">{d.departmentName}</div>
+                        <div className="doc-fee">
+                          LKR {d.consultationFee?.toFixed(2) ?? "—"}
+                          <span className="doc-fee-label">/ visit</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="availability-label">
+                      <Calendar size={11} />
+                      Check availability
+                    </div>
+                    <input
+                      type="date"
+                      min={today}
+                      className="chan-date-input"
+                      onChange={(e) => loadSlots(d, e.target.value)}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Slot panel */}
+            {selectedDoctor && date && (
+              <aside className="glass-card slot-panel">
+                <div className="slot-panel-header">
+                  <div className="slot-panel-name">{doctorLabel(selectedDoctor)}</div>
+                  <div className="slot-panel-date">{date}</div>
+                </div>
+
+                {loadingSlots ? (
+                  <div className="loading-text">Loading slots…</div>
+                ) : slots.length === 0 ? (
+                  <div className="loading-text">No slots available</div>
+                ) : (
+                  <>
+                    <div className="slot-section-title">
+                      <Clock size={10} style={{ display: "inline", marginRight: 4 }} />
+                      Available times
+                    </div>
+                    <div className="slots-grid">
+                      {slots.map((s) => (
+                        <button
+                          key={s.time}
+                          disabled={!s.available}
+                          onClick={() => setSelectedTime(s.time)}
+                          className={`slot-btn ${selectedTime === s.time ? "active" : ""}`}
+                        >
+                          {s.time}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {selectedTime && (
+                  <>
+                    <div className="slot-divider" />
+                    <div style={{ background: "rgba(0,40,100,0.4)", borderRadius: 8, padding: "10px 12px", border: "1px solid rgba(0,150,255,0.2)", marginTop: 2 }}>
+                      <div style={{ fontSize: 11, color: "rgba(140,180,230,0.5)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.08em" }}>Selected</div>
+                      <div style={{ fontSize: 14, color: "#00d4ff", fontWeight: 600 }}>{selectedTime}</div>
+                    </div>
+                    <button onClick={handleBook} className="book-btn">
+                      {isAuthenticated ? "Continue booking →" : "Sign in to book →"}
+                    </button>
+                  </>
+                )}
+
+                {!isAuthenticated && (
+                  <p className="register-hint">
+                    <Link to="/register">Register</Link> for a free patient account
+                  </p>
+                )}
+              </aside>
             )}
-            {selectedTime && (
-              <button
-                onClick={handleBook}
-                className="w-full mt-4 py-2.5 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700 transition"
-              >
-                {isAuthenticated ? "Continue booking" : "Sign in to book"}
-              </button>
-            )}
-            {!isAuthenticated && (
-              <p className="text-xs text-slate-400 mt-3 text-center">
-                <Link to="/register" className="text-teal-600 hover:underline">
-                  Register
-                </Link>{" "}
-                for a free patient account
-              </p>
-            )}
-          </aside>
-        )}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
