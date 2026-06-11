@@ -19,6 +19,7 @@ export default function Header({ user, onMenuOpen, activeLabel }: HeaderProps) {
           onClick={onMenuOpen}
           className="md:hidden p-1.5 rounded-lg hover:bg-gray-100"
         >
+          
           <Menu size={20} className="text-gray-600" />
         </button>
         <div>
@@ -54,5 +55,6 @@ export default function Header({ user, onMenuOpen, activeLabel }: HeaderProps) {
         </div>
       </div>
     </div>
+
   );
 }

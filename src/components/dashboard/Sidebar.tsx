@@ -32,11 +32,14 @@ export default function Sidebar({
             <span className="text-white font-bold text-sm">MC</span>
           </div>
           <div>
-            <Link to="/" className="text-sm font-bold text-gray-900">
-              <p className="text-sm font-bold text-gray-900 leading-none">
-                MediClinic
-              </p>
-            </Link>
+          <Link
+            to="/"
+            className="group inline-block cursor-pointer"
+          >
+            <p className="text-sm font-bold text-gray-900 leading-none transition-all duration-300 group-hover:text-cyan-700 group-hover:scale-105">
+              MediClinic
+            </p>
+          </Link>
             <p className="text-[10px] text-gray-400">Healthcare Portal</p>
           </div>
         </div>

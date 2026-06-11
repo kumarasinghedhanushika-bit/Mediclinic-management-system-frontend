@@ -78,7 +78,7 @@ export default function HomePage() {
         className="relative overflow-hidden"
         style={{
           background:
-            "linear-gradient(140deg,#d4edf5 0%,#bde0ee 40%,#c8e8f0 100%)",
+            "linear-gradient(140deg,#88CDF6 0%,#53A7D8 40%,#BCE6FF 100%)",
           minHeight: 420,
         }}
       >
@@ -129,16 +129,16 @@ export default function HomePage() {
               style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.08)" }}
             >
               <span
-                className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"
+                className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"
                 style={{ animation: "hpPulse 2s infinite" }}
               />
-              2500+ Doctors Online
+              Online hospital services
             </span>
 
             <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight tracking-tight mb-4">
               Premium Treatments for<br />
               a{" "}
-              <span style={{ color: "#2a8fa0" }}>Healthy</span> Lifestyle
+              <span style={{ color: "#015C92" }}>Healthy</span> Lifestyle
             </h1>
 
             <p className="text-sm text-slate-600 leading-relaxed max-w-md mb-8">
@@ -149,12 +149,12 @@ export default function HomePage() {
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() =>
-                  navigate(isAuthenticated ? "/dashboard" : "/channeling")
+                  navigate(isAuthenticated ? "/dashboard" : "/aboutus")
                 }
                 className="inline-flex items-center gap-2 px-6 py-3 text-white text-sm font-semibold rounded-full transition hover:-translate-y-px"
                 style={{
-                  background: "#2a8fa0",
-                  boxShadow: "0 4px 16px rgba(42,143,160,0.35)",
+                  background: "#015C92",
+                  boxShadow: "0 4px 16px rgba(1,92,146,0.35)",
                 }}
               >
                 <Search size={15} />
@@ -182,18 +182,8 @@ export default function HomePage() {
           <div className="relative z-10 flex justify-center items-end">
             <div className="relative" style={{ width: 320 }}>
 
-              {/*
-               * ── DOCTOR IMAGE ──────────────────────────────────────────────
-               * Replace this <div> with your actual doctor photo:
-               *
-               *   <img
-               *     src="/images/doctor-hero.png"
-               *     alt="Specialist doctor"
-               *     className="mx-auto w-72 h-auto object-cover"
-               *     style={{ borderRadius: "60% 60% 0 0" }}
-               *   />
-               * ──────────────────────────────────────────────────────────────
-               */}
+                
+              
               <div
                 className="mx-auto flex items-center justify-center"
                 style={{
@@ -206,7 +196,7 @@ export default function HomePage() {
                   backdropFilter: "blur(4px)",
                 }}
               >
-                <div className="flex flex-col items-center gap-2 text-teal-500/50">
+                <div className="fflex flex-col items-center gap-2 text-[#53A7D8]/50">
                   <Stethoscope size={48} strokeWidth={1.2} />
                   <span className="text-xs font-medium text-center leading-relaxed">
                     Add doctor image here
@@ -228,7 +218,7 @@ export default function HomePage() {
               >
                 <div
                   className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ background: "#1a3a4a" }}
+                  style={{ background: "#53A7D8" }}
                 >
                   <Search size={14} color="white" />
                 </div>
@@ -267,10 +257,10 @@ export default function HomePage() {
                   : "none",
             }}
           >
-            <p className="text-2xl font-extrabold" style={{ color: "#0f2d3a" }}>
+            <p className="text-2xl font-extrabold" style={{ color: "#53A7D8" }}>
               {value}
             </p>
-            <p className="text-xs font-medium mt-0.5" style={{ color: "#5a8090" }}>
+            <p className="text-xs font-medium mt-0.5" style={{ color: "#53A7D8" }}>
               {label}
             </p>
           </div>
@@ -278,7 +268,7 @@ export default function HomePage() {
       </div>
 
       {/* ── SEARCH BAR ────────────────────────────────────────────────────── */}
-      <div className="px-4 md:px-10 py-5" style={{ background: "#3a7f92" }}>
+      <div className="px-4 md:px-10 py-5" style={{ background: "#2D82B5" }}>
         <div
           className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 overflow-hidden rounded-xl"
           style={{
@@ -299,7 +289,7 @@ export default function HomePage() {
                 <option
                   key={d.id}
                   value={String(d.id)}
-                  style={{ background: "#2a6878", color: "white" }}
+                  style={{ background: "#53A7D8", color: "white" }}
                 >
                   {d.name}
                 </option>
@@ -320,8 +310,8 @@ export default function HomePage() {
               className="w-full bg-transparent text-sm font-medium px-4 py-4 outline-none appearance-none cursor-pointer"
               style={{ color: searchDoctor ? "white" : "rgba(255,255,255,0.65)" }}
             >
-              <option value="" disabled style={{ background: "#2a6878" }}>Select Doctor</option>
-              <option value="any" style={{ background: "#2a6878", color: "white" }}>Any Doctor</option>
+              <option value="" disabled style={{ background: "#BCE6FF" }}>Select Doctor</option>
+              <option value="any" style={{ background: "#53A7D8", color: "white" }}>Any Doctor</option>
             </select>
             <ChevronDown
               size={14}
@@ -338,10 +328,10 @@ export default function HomePage() {
               className="w-full bg-transparent text-sm font-medium px-4 py-4 outline-none appearance-none cursor-pointer"
               style={{ color: searchDate ? "white" : "rgba(255,255,255,0.65)" }}
             >
-              <option value="" disabled style={{ background: "#2a6878" }}>Select Date</option>
-              <option value="today"    style={{ background: "#2a6878", color: "white" }}>Today</option>
-              <option value="tomorrow" style={{ background: "#2a6878", color: "white" }}>Tomorrow</option>
-              <option value="week"     style={{ background: "#2a6878", color: "white" }}>This Week</option>
+              <option value="" disabled style={{ background: "#BCE6FF" }}>Select Date</option>
+              <option value="today"    style={{ background: "#53A7D8", color: "white" }}>Today</option>
+              <option value="tomorrow" style={{ background: "#53A7D8", color: "white" }}>Tomorrow</option>
+              <option value="week"     style={{ background: "#53A7D8", color: "white" }}>This Week</option>
             </select>
             <ChevronDown
               size={14}
@@ -358,10 +348,10 @@ export default function HomePage() {
               className="w-full bg-transparent text-sm font-medium px-4 py-4 outline-none appearance-none cursor-pointer"
               style={{ color: searchLocation ? "white" : "rgba(255,255,255,0.65)" }}
             >
-              <option value="" disabled style={{ background: "#2a6878" }}>Select Location</option>
-              <option value="colombo" style={{ background: "#2a6878", color: "white" }}>Colombo</option>
-              <option value="kandy"   style={{ background: "#2a6878", color: "white" }}>Kandy</option>
-              <option value="galle"   style={{ background: "#2a6878", color: "white" }}>Galle</option>
+              <option value="" disabled style={{ background: "#BCE6FF" }}>Select Location</option>
+              <option value="colombo" style={{ background: "#53A7D8", color: "white" }}>Colombo</option>
+              <option value="kandy"   style={{ background: "#53A7D8", color: "white" }}>Kandy</option>
+              <option value="galle"   style={{ background: "#53A7D8", color: "white" }}>Galle</option>
             </select>
             <ChevronDown
               size={14}
@@ -383,7 +373,7 @@ export default function HomePage() {
       </div>
 
       {/* ── FEATURES ──────────────────────────────────────────────────────── */}
-      <section className="py-16 px-4 md:px-10" style={{ background: "#e8f4f8" }}>
+      <section className="py-16 px-4 md:px-10" style={{ background: " #BCE6FF" }}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-extrabold mb-2" style={{ color: "#0f2d3a" }}>
@@ -407,7 +397,7 @@ export default function HomePage() {
                   className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
                   style={{ background: "linear-gradient(135deg,#e8f4f8,#d4edf5)" }}
                 >
-                  <Icon size={22} color="#2a8fa0" strokeWidth={1.8} />
+                  <Icon size={22} color="#88CDF6" strokeWidth={1.8} />
                 </div>
                 <h3 className="font-bold text-sm mb-2" style={{ color: "#0f2d3a" }}>
                   {title}
@@ -456,7 +446,7 @@ export default function HomePage() {
                   <div
                     key={i}
                     className="h-20 rounded-xl animate-pulse"
-                    style={{ background: "#e8f4f8" }}
+                    style={{ background: "#BCE6FF" }}
                   />
                 ))
               : departments.map((d) => (
@@ -465,7 +455,7 @@ export default function HomePage() {
                     to={`/channeling?department=${d.id}`}
                     className="block p-5 rounded-xl transition-all duration-150 hover:-translate-y-px"
                     style={{
-                      background: "#fafeff",
+                      background: "#BCE6FF",
                       border: "0.5px solid rgba(42,143,160,0.12)",
                     }}
                   >
@@ -487,7 +477,7 @@ export default function HomePage() {
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
       <section
         className="py-16 px-4 text-center text-white"
-        style={{ background: "linear-gradient(135deg,#1e6878,#2a8fa0)" }}
+        style={{ background: "linear-gradient(135deg,#53A7D8,#88CDF6,#BCE6FF,#2D82B5)" }}
       >
         <h2 className="text-2xl font-extrabold mb-2">
           Ready to channel a doctor?
@@ -499,7 +489,7 @@ export default function HomePage() {
           onClick={() => navigate("/channeling")}
           className="bg-white font-bold text-sm px-8 py-3 rounded-full transition hover:-translate-y-px"
           style={{
-            color: "#1e6878",
+            color: "#015C9B",
             boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
           }}
         >
