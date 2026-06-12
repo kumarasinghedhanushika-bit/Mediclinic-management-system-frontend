@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 
+
 const doctors = [
 {
 name: "Dr. Priya Mendis",
@@ -76,7 +77,7 @@ whatsapp: "https://wa.me/94XXXXXXXXXX",
 };
 
 export default function AboutUs() {
-const [activeDoc, setActiveDoc] = useState(null);
+const [activeDoc, setActiveDoc] = useState<(typeof doctors)[number] | null>(null);
 
 return (
 <div className="min-h-screen font-sans" style={{ backgroundColor: "#f0f8ff" }}>
@@ -91,14 +92,14 @@ return (
         className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm"
         style={{ backgroundColor: "#1a6fa0" }}
         >
-        M+
+        MC+
         </div>
         <span className="font-semibold text-[#0d4a70] text-lg tracking-tight">MediClinic</span>
     </div>
     <div className="hidden md:flex gap-7 text-sm font-medium text-[#1a6fa0]">
-        {["Home", "About", "Services", "Doctors", "Contact"].map((n) => (
-        <a key={n} href="#" className="hover:text-[#0d4a70] transition-colors">{n}</a>
-        ))}
+    <a href="/" className="hover:text-[#0d4a70] transition-colors">Home</a>
+    <a href="#services" className="hover:text-[#0d4a70] transition-colors">Services</a>
+    <a href="#doctors" className="hover:text-[#0d4a70] transition-colors">Doctors</a>
     </div>
     <a
         href={SOCIAL.whatsapp}
