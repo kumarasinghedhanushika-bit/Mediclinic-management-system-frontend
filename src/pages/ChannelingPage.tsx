@@ -157,6 +157,14 @@ export default function ChannelingPage() {
           transition: border-color 0.2s, box-shadow 0.2s;
         }
 
+        
+              <div className="doctor-image-overlay">
+              <h2>Your Health</h2>
+              <p>Professional Medical Care & Online Channeling</p>
+              </div>
+            </div>
+          </div>
+
         /* Filters sidebar */
         .chan-filters {
           width: 280px;
@@ -356,6 +364,8 @@ export default function ChannelingPage() {
           border-color: rgba(0,200,255,0.5);
         }
 
+        
+
         /* Slot panel */
         .slot-panel {
           width: 300px;
@@ -507,6 +517,7 @@ export default function ChannelingPage() {
           font-size: 14px;
         }
 
+        
         /* Divider line decoration in slot panel */
         .slot-divider {
           height: 1px;
@@ -544,6 +555,16 @@ export default function ChannelingPage() {
 
           {/* Main layout */}
           <div className="chan-layout" style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+          
+                 {/* LEFT IMAGE */}
+                <div className="doctor-image-panel">
+                  <img
+                    src="/mendoctor.png"
+                    alt="Doctor"
+                    className="doctor-side-image"
+                  />
+                </div>
+
 
             {/* Filters */}
             <aside className="chan-filters">
