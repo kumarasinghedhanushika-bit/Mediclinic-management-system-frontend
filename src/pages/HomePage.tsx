@@ -172,7 +172,7 @@ export default function HomePage() {
   const slide = HERO_SLIDES[activeSlide];
 
   return (
-    <div className="font-sans" style={{ background: "#F4FAFE" }}>
+    <div className="font-sans" style={{ background: "#F46AFE" }}>
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section
