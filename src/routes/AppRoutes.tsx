@@ -18,6 +18,7 @@ import DocCard from "../pages/doccard";
 
 
 
+
 const router = createBrowserRouter([
   {
     element: <PublicLayout />,
@@ -35,7 +36,8 @@ const router = createBrowserRouter([
       { path: "/oauth2/callback", element: <OAuth2CallbackPage /> },
       { path: "/aboutus", element: <AboutUs /> },
       { path: "/allservice", element: <AllService /> },
-      { path: "/doccard", element: <DocCard /> }
+      { path: "/doccard", element: <DocCard /> },
+      
 
     ],
   },

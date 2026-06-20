@@ -1004,7 +1004,7 @@ export default function HomePage() {
                 alt="Lab technician handing over a verified report"
                 className="w-full h-72 md:h-96 object-cover"
                 onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = "/bed.jpg";
+                  (e.currentTarget as HTMLImageElement).src = "/bed.jpg"; 
                 }}
               />
             </div>
