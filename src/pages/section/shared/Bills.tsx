@@ -43,6 +43,7 @@ export default function Bills({ role, user }: Props) {
           ? await billService.byPatient(patientId)
           : [];
         setBills(data);
+        console.log("Loaded bills for patient:", data);
       } else {
         const data = await billService.getAll();
         setBills(data);
