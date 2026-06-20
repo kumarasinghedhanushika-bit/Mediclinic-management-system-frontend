@@ -13,6 +13,8 @@ import PaymentSuccess from "../pages/payment/PaymentSuccess";
 import PaymentCancel from "../pages/payment/PaymentCancel";
 import OAuth2CallbackPage from "../pages/OAuth2CallbackPage";
 import AboutUs from "../pages/aboutus";
+import AllService from "../pages/allservice";
+import DocCard from "../pages/doccard";
 
 
 
@@ -31,8 +33,9 @@ const router = createBrowserRouter([
       { path: "/payment/cancel", element: <PaymentCancel /> },
       { path: "/verify-email", element: <VerifyEmail /> },
       { path: "/oauth2/callback", element: <OAuth2CallbackPage /> },
-      { path: "/aboutus", element: <AboutUs /> }
-    
+      { path: "/aboutus", element: <AboutUs /> },
+      { path: "/allservice", element: <AllService /> },
+      { path: "/doccard", element: <DocCard /> }
 
     ],
   },

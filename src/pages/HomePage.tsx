@@ -26,7 +26,7 @@ import { useAuth } from "../context/AuthContext";
 // ── Hero Slides ────────────────────────────────────────────────────────────────
 const HERO_SLIDES = [
   {
-    image: "/dc2.jpg",
+    image: "/helth.jpg",
     badge: "Specialist Consultations",
     headline: "Premium Treatments for a",
     highlight: "Healthy",
@@ -36,7 +36,7 @@ const HERO_SLIDES = [
     accent: "#88CDF6",
   },
   {
-    image: "/dc.jpg",
+    image: "/emergency.jpg",
     badge: "24/7 Emergency Care",
     headline: "Always Here When",
     highlight: "You Need",
@@ -46,7 +46,7 @@ const HERO_SLIDES = [
     accent: "#F6D888",
   },
   {
-    image: "/medi1.jpg",
+    image: "/medic.jpg",
     badge: "Advanced Radiology",
     headline: "Clarity Through",
     highlight: "Precise",
@@ -56,7 +56,7 @@ const HERO_SLIDES = [
     accent: "#A8F6C0",
   },
   {
-    image: "/medi2.jpg",
+    image: "/bed.jpg",
     badge: "Expert Surgical Teams",
     headline: "Trusted Hands for",
     highlight: "Safer",
@@ -66,7 +66,18 @@ const HERO_SLIDES = [
     accent: "#F6A8C0",
   },
   {
-    image: "/chaild.jpg",
+    image: "/familiy.jpg",
+    badge: "Paediatric Care",
+    headline: "Gentle Care for",
+    highlight: "Little",
+    subline: "Ones",
+    desc: "Dedicated paediatric specialists providing compassionate, child-friendly healthcare from birth through adolescence.",
+    stat: { value: "5000+", label: "Children Treated" },
+    accent: "#C0A8F6",
+  },
+
+  {
+    image: "/medi.jpg",
     badge: "Paediatric Care",
     headline: "Gentle Care for",
     highlight: "Little",
@@ -135,7 +146,7 @@ export default function HomePage() {
     if (isPaused) return;
     const timer = setInterval(() => {
       goToSlide((activeSlide + 1) % HERO_SLIDES.length, "next");
-    }, 5000);
+    }, 3000);
     return () => clearInterval(timer);
   }, [activeSlide, isPaused]);
 
@@ -188,7 +199,7 @@ export default function HomePage() {
             className="absolute inset-0 transition-opacity duration-700"
             style={{
               opacity: i === activeSlide ? 1 : 0,
-              backgroundImage: `linear-gradient(120deg, rgba(6,32,56,0.90) 0%, rgba(1,92,146,0.82) 45%, rgba(83,167,216,0.60) 100%), url('${s.image}')`,
+              backgroundImage: `linear-gradient(120deg, rgba(6,32,56,0.40) 0%, rgba(1,92,146,0.30) 45%, rgba(83,167,216,0.20) 100%), url('${s.image}')`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               zIndex: 0,
@@ -541,7 +552,7 @@ export default function HomePage() {
               Our Services
             </h2>
             <Link
-              to="/channeling"
+              to="/allservice"
               className="text-sm font-semibold flex items-center gap-1 transition hover:underline"
               style={{ color: "#2a8fa0" }}
             >
@@ -630,7 +641,7 @@ export default function HomePage() {
               </p>
             </div>
             <Link
-              to="/channeling"
+              to="/doccard"
               className="text-sm font-semibold flex items-center gap-1 transition hover:underline"
               style={{ color: "#2a8fa0" }}
             >
