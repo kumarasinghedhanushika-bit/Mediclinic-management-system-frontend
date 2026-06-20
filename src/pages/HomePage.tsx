@@ -1,6 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
+
+  Star,
+  MapPin,
   Calendar,
   Shield,
   Clock,
@@ -18,6 +21,11 @@ import {
   Phone,
   ChevronLeft,
   ChevronRight,
+  FileText,
+  ClipboardCheck,
+  CreditCard,
+  BadgeCheck,
+  Sparkles,
 } from "lucide-react";
 import { publicService } from "../api";
 import type { Department } from "../types";
@@ -115,6 +123,56 @@ const SERVICES = [
   { icon: ScanLine, label: "Radiology" },
   { icon: FlaskConical, label: "Laboratory" },
   { icon: Pill, label: "Pharmacy" },
+];
+
+// ── Lab report checklist points ─────────────────────────────────────────────────
+const LAB_CHECKLIST = [
+  {
+    icon: FileText,
+    title: "Lab report requirements",
+    desc: "Know exactly which tests are needed before your visit and avoid delays.",
+  },
+  {
+    icon: ClipboardCheck,
+    title: "Multi-test result tracking",
+    desc: "View every test result in one place, updated the moment results are ready.",
+  },
+  {
+    icon: BadgeCheck,
+    title: "Verified by specialists",
+    desc: "Every report is reviewed and signed off by a certified lab specialist.",
+  },
+];
+
+// ── Lab report quick cards ──────────────────────────────────────────────────────
+const LAB_CARDS = [
+  {
+    icon: ClipboardCheck,
+    title: "Book & Relax",
+    desc: "Reserve your test slot online and avoid waiting in line at the lab.",
+  },
+  {
+    icon: Sparkles,
+    title: "Smart Checklist",
+    desc: "Get a personalised pre-test checklist sent straight to your phone.",
+  },
+  {
+    icon: FileText,
+    title: "Save Report",
+    desc: "Download or share your verified lab report anytime, from any device.",
+  },
+];
+
+// ── Image gallery items ─────────────────────────────────────────────────────────
+const GALLERY_ITEMS = [
+  { image: "/cardiology.jpg", title: "Cardiology Ward", rating: "4.9", tag: "Specialist Care" },
+  { image: "/radiology.jpg", title: "Radiology Suite", rating: "4.8", tag: "Advanced Imaging" },
+  { image: "/surgery.jpg", title: "Surgical Theatre", rating: "4.9", tag: "Expert Surgeons" },
+  { image: "/emargy.jpg", title: "Emergency Unit", rating: "4.7", tag: "24/7 Care" },
+  { image: "/chaild.jpg", title: "Maternity Ward", rating: "5.0", tag: "Mother & Child" },
+  { image: "/laboratary.jpg", title: "Laboratory", rating: "4.8", tag: "Verified Reports" },
+  { image: "/ph.jpg", title: "Pharmacy", rating: "4.7", tag: "Quick Dispensing" },
+  { image: "/patient.jpg", title: "Patient Lounge", rating: "4.9", tag: "Comfort First" },
 ];
 
 export default function HomePage() {
@@ -620,6 +678,255 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── LAB REPORT / TEST DETAILS ────────────────────────────────────────
+          Inspired by "Plan your travel with confidence" layout:
+          headline + checklist on the left, floating image collage on the
+          right, then 3 quick-info cards underneath. */}
+      <section className="py-16 px-4 md:px-10 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-10 items-center mb-14">
+            {/* Left: headline + checklist */}
+            <div className="lab-fade-up">
+              <span
+                className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold mb-5"
+                style={{ background: "#F0F8FD", color: "#015C92", border: "0.5px solid rgba(42,143,160,0.15)" }}
+              >
+                <FlaskConical size={13} />
+                Laboratory Support
+              </span>
+
+              <h2
+                className="text-2xl md:text-3xl font-extrabold leading-tight mb-3"
+                style={{ color: "#0f2d3a" }}
+              >
+                Plan your lab tests with confidence
+              </h2>
+              <p className="text-sm mb-7 max-w-md" style={{ color: "#5a8090" }}>
+                Get clarity before you visit — see exactly what each test needs and
+                review your results the moment they're verified.
+              </p>
+
+              <div className="flex flex-col gap-4 mb-8">
+                {LAB_CHECKLIST.map(({ icon: Icon, title, desc }, i) => (
+                  <div
+                    key={title}
+                    className="flex items-start gap-4 lab-fade-up"
+                    style={{ animationDelay: `${i * 120}ms` }}
+                  >
+                    <span
+                      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: "linear-gradient(135deg,#e8f4f8,#d4edf5)" }}
+                    >
+                      <Icon size={18} color="#015C92" strokeWidth={1.8} />
+                    </span>
+                    <div>
+                      <h4 className="text-sm font-bold mb-0.5" style={{ color: "#0f2d3a" }}>
+                        {title}
+                      </h4>
+                      <p className="text-xs leading-relaxed" style={{ color: "#6a8a98" }}>
+                        {desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => navigate("/testdetails")}
+                className="inline-flex items-center gap-2 px-6 py-3 text-white text-sm font-semibold rounded-full transition hover:-translate-y-px"
+                style={{ background: "#015C92", boxShadow: "0 4px 16px rgba(1,92,146,0.35)" }}
+              >
+                <FileText size={15} />
+                View Test Details
+                <ArrowRight size={15} />
+              </button>
+            </div>
+
+            {/* Right: floating image collage */}
+            <div className="relative hidden md:block" style={{ height: 380 }}>
+              <div
+                className="absolute rounded-3xl overflow-hidden lab-float"
+                style={{
+                  width: 230,
+                  height: 290,
+                  top: 10,
+                  left: 40,
+                  boxShadow: "0 20px 50px rgba(0,0,0,0.18)",
+                  border: "6px solid white",
+                }}
+              >
+                <img
+                  src="/lab.jpg"
+                  alt="Lab specialist preparing a sample"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "/helth.jpg";
+                  }}
+                />
+              </div>
+              <div
+                className="absolute rounded-2xl overflow-hidden lab-float-delayed"
+                style={{
+                  width: 170,
+                  height: 170,
+                  top: 190,
+                  left: 230,
+                  boxShadow: "0 20px 50px rgba(0,0,0,0.18)",
+                  border: "6px solid white",
+                }}
+              >
+                <img
+                  src="/lab1.jpg"
+                  alt="Printed lab report"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = "/medic.jpg";
+                  }}
+                />
+              </div>
+              <div
+                className="absolute rounded-2xl px-4 py-3 flex items-center gap-3"
+                style={{
+                  top: 0,
+                  left: 250,
+                  background: "white",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+                }}
+              >
+                <span
+                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: "#BCE6FF" }}
+                >
+                  <BadgeCheck size={16} color="#015C92" />
+                </span>
+                <div>
+                  <p className="text-sm font-extrabold leading-none" style={{ color: "#0f2d3a" }}>
+                    Verified
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">By specialists</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick info cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {LAB_CARDS.map(({ icon: Icon, title, desc }, i) => (
+              <div
+                key={title}
+                className="rounded-2xl p-6 text-center lab-fade-up"
+                style={{
+                  background: "#F0F8FD",
+                  border: "0.5px solid rgba(42,143,160,0.10)",
+                  animationDelay: `${i * 130}ms`,
+                }}
+              >
+                <span
+                  className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3"
+                  style={{ background: "white", boxShadow: "0 6px 16px rgba(1,92,146,0.12)" }}
+                >
+                  <Icon size={20} color="#015C92" strokeWidth={1.8} />
+                </span>
+                <h4 className="text-sm font-bold mb-1" style={{ color: "#0f2d3a" }}>
+                  {title}
+                </h4>
+                <p className="text-xs leading-relaxed" style={{ color: "#6a8a98" }}>
+                  {desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+{/* ── IMAGE GALLERY ─────────────────────────────────────────────────── */}
+      <section className="py-16 px-4 md:px-10 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-end justify-between mb-7 flex-wrap gap-4">
+            <div>
+              <h2 className="text-xl font-extrabold" style={{ color: "#0f2d3a" }}>
+                Inside Our Hospital
+              </h2>
+              <p className="text-sm mt-1" style={{ color: "#6a8a98" }}>
+                A look at the spaces and teams that care for you
+              </p>
+            </div>
+            <Link
+              to="/aboutus"
+              className="text-sm font-semibold flex items-center gap-1 transition hover:underline"
+              style={{ color: "#2a8fa0" }}
+            >
+              View all <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {GALLERY_ITEMS.map((item, i) => (
+              <button
+                key={item.title}
+                onClick={() => navigate("/aboutus")}
+                className="group relative rounded-2xl overflow-hidden text-left gallery-fade-up"
+                style={{
+                  aspectRatio: "3 / 4",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                  animationDelay: `${i * 80}ms`,
+                }}
+              >
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  onError={(e) => {
+                    const fallbacks = ["/helth.jpg", "/emergency.jpg", "/medic.jpg", "/bed.jpg", "/familiy.jpg", "/medi.jpg"];
+                    (e.currentTarget as HTMLImageElement).src = fallbacks[i % fallbacks.length];
+                  }}
+                />
+
+                <div
+                  className="absolute inset-0 transition-opacity duration-300"
+                  style={{
+                    background:
+                      "linear-gradient(to top, rgba(6,32,56,0.78) 0%, rgba(6,32,56,0.05) 55%, transparent 100%)",
+                  }}
+                />
+
+                <span
+                  className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-transform duration-300 group-hover:-translate-y-0.5"
+                  style={{
+                    background: "rgba(255,255,255,0.92)",
+                    color: "#015C92",
+                    backdropFilter: "blur(6px)",
+                  }}
+                >
+                  <MapPin size={10} />
+                  {item.tag}
+                </span>
+
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h4 className="text-white text-sm font-bold mb-1.5 leading-tight">
+                    {item.title}
+                  </h4>
+                  <div
+                    className="inline-flex items-center gap-1 rounded-full px-2 py-1"
+                    style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(6px)" }}
+                  >
+                    <Star size={11} color="#F6D888" fill="#F6D888" />
+                    <span className="text-white text-[11px] font-semibold">{item.rating}</span>
+                  </div>
+                </div>
+
+                <div
+                  className="absolute inset-0 rounded-2xl pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-100"
+                  style={{ boxShadow: "inset 0 0 0 2.5px #88CDF6" }}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+
       {/* ── DEPARTMENTS ───────────────────────────────────────────────────── */}
       <section
         id="departments"
@@ -680,6 +987,101 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── PAYMENT & SERVICE DESCRIPTION ────────────────────────────────────
+          Inspired by "Unleash wanderlust" layout: photo on one side,
+          bold headline + descriptive copy on the other, with a pricing /
+          payment summary card. */}
+      <section className="py-16 px-4 md:px-10" style={{ background: "#F0F8FD" }}>
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+          {/* Photo */}
+          <div className="lab-fade-up order-2 md:order-1">
+            <div
+              className="rounded-3xl overflow-hidden"
+              style={{ boxShadow: "0 20px 50px rgba(0,0,0,0.15)" }}
+            >
+              <img
+                src="/badytest.jpg"
+                alt="Lab technician handing over a verified report"
+                className="w-full h-72 md:h-96 object-cover"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = "/bed.jpg";
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Headline + payment description card */}
+          <div className="order-1 md:order-2 lab-fade-up" style={{ animationDelay: "120ms" }}>
+            <h2
+              className="text-3xl md:text-4xl font-extrabold leading-tight mb-2 uppercase"
+              style={{ color: "#0f2d3a" }}
+            >
+              Pay Once,
+              <br />
+              Track Every Test
+            </h2>
+            <p className="text-sm mb-2 max-w-md" style={{ color: "#5a8090" }}>
+              One secure payment covers your full lab package — sample
+              collection, specialist review, and a verified digital report.
+            </p>
+            <p className="text-sm mb-7 max-w-md" style={{ color: "#5a8090" }}>
+              No hidden charges. Refunds are processed automatically if a test
+              is cancelled before sample collection.
+            </p>
+
+            {/* Payment description card */}
+            <div
+              className="rounded-2xl p-6 bg-white"
+              style={{ border: "0.5px solid rgba(42,143,160,0.12)", boxShadow: "0 10px 30px rgba(0,0,0,0.06)" }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span
+                    className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: "linear-gradient(135deg,#e8f4f8,#d4edf5)" }}
+                  >
+                    <CreditCard size={20} color="#015C92" strokeWidth={1.8} />
+                  </span>
+                  <div>
+                    <h4 className="text-sm font-bold" style={{ color: "#0f2d3a" }}>
+                      Full Blood Panel
+                    </h4>
+                    <p className="text-xs" style={{ color: "#6a8a98" }}>
+                      Sample collection + report + review
+                    </p>
+                  </div>
+                </div>
+                <p className="text-lg font-extrabold" style={{ color: "#015C92" }}>
+                  Rs. 3,500
+                </p>
+              </div>
+
+              <ul className="flex flex-col gap-2 mb-5">
+                {[
+                  "Home or in-lab sample collection",
+                  "Verified report within 24 hours",
+                  "Secure PayHere checkout",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-xs" style={{ color: "#5a8090" }}>
+                    <BadgeCheck size={14} color="#2a8fa0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={() => navigate("/testdetails")}
+                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 text-white text-sm font-semibold rounded-full transition hover:-translate-y-px"
+                style={{ background: "#015C92", boxShadow: "0 4px 16px rgba(1,92,146,0.35)" }}
+              >
+                <FileText size={15} />
+                View Test Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
       <section
         className="py-16 px-4 text-center text-white relative overflow-hidden"
@@ -731,6 +1133,40 @@ export default function HomePage() {
           0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.45); }
           50%       { box-shadow: 0 0 0 5px rgba(255,255,255,0); }
         }
+        @keyframes labFadeUp {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes labFloat {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-10px); }
+        }
+        @keyframes labFloatDelayed {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(10px); }
+        }
+        .lab-fade-up {
+          animation: labFadeUp 0.7s ease both;
+        }
+        .lab-float {
+          animation: labFloat 4.5s ease-in-out infinite;
+        }
+        .lab-float-delayed {
+          animation: labFloatDelayed 5.5s ease-in-out infinite;
+        }
+        @media (max-width: 768px) {
+          .lab-float, .lab-float-delayed {
+            animation: none;
+          }
+        }
+@keyframes galleryFadeUp {
+          from { opacity: 0; transform: translateY(22px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .gallery-fade-up {
+          animation: galleryFadeUp 0.6s ease both;
+        }
+
       `}</style>
     </div>
   );
