@@ -1,7 +1,7 @@
 import type { PayHereCheckout } from "../types";
 
 /**
- * Redirect user to PayHere gateway using POST form
+ * Redirect user to PayHere gateway using POST form securely
  */
 export function redirectToPayHere(checkout: PayHereCheckout) {
   const form = document.createElement("form");
@@ -17,7 +17,7 @@ export function redirectToPayHere(checkout: PayHereCheckout) {
     order_id: checkout.orderId,
     items: checkout.items || "Consultation",
     currency: checkout.currency,
-    amount: checkout.amount,
+    amount: Number(checkout.amount).toFixed(2), // Force double decimal pricing matching the backend hash
 
     first_name: checkout.firstName || "Patient",
     last_name: checkout.lastName || "User",
@@ -40,4 +40,5 @@ export function redirectToPayHere(checkout: PayHereCheckout) {
 
   document.body.appendChild(form);
   form.submit();
+  document.body.removeChild(form);
 }

@@ -4,7 +4,6 @@ import { billService, patientService, paymentService } from "../../../api";
 import type { Bill, Role, User } from "../../../types";
 import { redirectToPayHere } from "../../../utils/payhere";
 
-
 const STATUS_STYLE: Record<string, string> = {
   PENDING: "bg-amber-100 text-amber-700",
   PAID: "bg-green-100 text-green-700",
@@ -31,19 +30,14 @@ export default function Bills({ role, user }: Props) {
     currency: "LKR",
   });
 
-  // ======================
   // LOAD BILLS
-  // ======================
   const load = async () => {
     setLoading(true);
     try {
       if (role === "PATIENT" && user?.id) {
         const patientId = await patientService.findIdByUserId(user.id);
-        const data = patientId
-          ? await billService.byPatient(patientId)
-          : [];
+        const data = patientId ? await billService.byPatient(patientId) : [];
         setBills(data);
-        console.log("Loaded bills for patient:", data);
       } else {
         const data = await billService.getAll();
         setBills(data);
@@ -55,27 +49,27 @@ export default function Bills({ role, user }: Props) {
     }
   };
 
+  // Run on component mount and whenever role/user dynamically resolves
   useEffect(() => {
-    load();
+    if (role && user?.id) {
+      load();
+    }
   }, [role, user?.id]);
 
-  // ======================
   // PAY NOW (PAYHERE)
-  // ======================
   const handlePay = async (bill: Bill) => {
+    console.log("Bill => ", bill);
     if (!bill.appointmentId || !bill.amount) {
       return toast.error("Invalid bill");
     }
 
     try {
       setPaying(bill.id);
-
       const res = await paymentService.checkout(
         bill.appointmentId,
         bill.amount,
         bill.description || "Consultation"
       );
-
       redirectToPayHere(res);
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Payment failed");
@@ -84,10 +78,11 @@ export default function Bills({ role, user }: Props) {
     }
   };
 
-  // ======================
   // CREATE BILL (ADMIN/RECEPTIONIST)
-  // ======================
   const handleCreateBill = async () => {
+    if (!newBill.patientId || !newBill.appointmentId || newBill.amount <= 0) {
+      return toast.error("Please fill all fields correctly");
+    }
     try {
       await billService.create(newBill as Bill);
       toast.success("Bill created");
@@ -107,12 +102,9 @@ export default function Bills({ role, user }: Props) {
 
   const canCreate = role === "ADMIN" || role === "RECEPTIONIST";
 
-  // ======================
-  // LOADING UI
-  // ======================
   if (loading) {
     return (
-      <div className="text-center py-10 text-gray-500 text-sm">
+      <div className="text-center py-10 text-gray-500 text-sm animate-pulse">
         Loading bills...
       </div>
     );
@@ -120,140 +112,105 @@ export default function Bills({ role, user }: Props) {
 
   return (
     <div className="p-4 space-y-6">
-
       {/* HEADER */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">
+        <h2 className="text-xl font-semibold text-slate-800">
           {role === "PATIENT" ? "My Bills" : "Billing Management"}
         </h2>
 
         {canCreate && (
           <button
             onClick={() => setShowCreate(!showCreate)}
-            className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-700"
+            className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-teal-700 transition"
           >
-            + Create Bill
+            {showCreate ? "Close" : "+ Create Bill"}
           </button>
         )}
       </div>
 
       {/* CREATE BILL FORM */}
       {showCreate && canCreate && (
-        <div className="bg-white border rounded-xl p-4 space-y-3 shadow-sm">
-
+        <div className="bg-white border rounded-xl p-4 space-y-3 shadow-sm max-w-md">
           <input
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded text-sm focus:outline-teal-600"
             placeholder="Patient ID"
             value={newBill.patientId}
-            onChange={(e) =>
-              setNewBill({ ...newBill, patientId: e.target.value })
-            }
+            onChange={(e) => setNewBill({ ...newBill, patientId: e.target.value })}
           />
-
           <input
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded text-sm focus:outline-teal-600"
             placeholder="Appointment ID"
             value={newBill.appointmentId}
-            onChange={(e) =>
-              setNewBill({ ...newBill, appointmentId: e.target.value })
-            }
+            onChange={(e) => setNewBill({ ...newBill, appointmentId: e.target.value })}
           />
-
           <input
             type="number"
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded text-sm focus:outline-teal-600"
             placeholder="Amount"
-            value={newBill.amount}
-            onChange={(e) =>
-              setNewBill({ ...newBill, amount: Number(e.target.value) })
-            }
+            value={newBill.amount || ""}
+            onChange={(e) => setNewBill({ ...newBill, amount: Number(e.target.value) })}
           />
-
           <input
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded text-sm focus:outline-teal-600"
             placeholder="Description"
             value={newBill.description}
-            onChange={(e) =>
-              setNewBill({ ...newBill, description: e.target.value })
-            }
+            onChange={(e) => setNewBill({ ...newBill, description: e.target.value })}
           />
-
           <button
             onClick={handleCreateBill}
-            className="w-full bg-teal-600 text-white py-2 rounded hover:bg-teal-700"
+            className="w-full bg-teal-600 text-white py-2 rounded text-sm font-medium hover:bg-teal-700 transition"
           >
             Save Bill
           </button>
         </div>
       )}
 
-      {/* EMPTY STATE */}
+      {/* BILLS TABLE */}
       {bills.length === 0 ? (
-        <div className="text-center text-gray-400 py-10">
+        <div className="text-center text-gray-400 py-10 border rounded-xl bg-gray-50/50">
           No bills found
         </div>
       ) : (
         <div className="overflow-x-auto bg-white border rounded-xl shadow-sm">
-          <table className="w-full text-sm">
-
-            <thead className="bg-gray-100 text-left">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gray-50 border-b text-gray-600">
               <tr>
-                <th className="p-3">Order</th>
-                <th className="p-3">Description</th>
-                <th className="p-3">Amount</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Action</th>
+                <th className="p-3 font-medium">Order ID</th>
+                <th className="p-3 font-medium">Description</th>
+                <th className="p-3 font-medium">Amount</th>
+                <th className="p-3 font-medium">Status</th>
+                <th className="p-3 font-medium text-right">Action</th>
               </tr>
             </thead>
-
-            <tbody>
+            <tbody className="divide-y text-slate-700">
               {bills.map((b) => (
-                <tr key={b.id} className="border-t">
-
-                  {/* ORDER */}
-                  <td className="p-3 font-mono text-xs">
+                <tr key={b.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="p-3 font-mono text-xs text-slate-500">
                     {b.orderId || b.id.slice(-6)}
                   </td>
-
-                  {/* DESCRIPTION */}
-                  <td className="p-3">
-                    {b.description || "Consultation"}
-                  </td>
-
-                  {/* AMOUNT */}
-                  <td className="p-3">
+                  <td className="p-3">{b.description || "Consultation"}</td>
+                  <td className="p-3 font-medium">
                     {b.currency} {b.amount?.toFixed(2)}
                   </td>
-
-                  {/* STATUS */}
                   <td className="p-3">
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${
-                        STATUS_STYLE[b.paymentStatus || "PENDING"]
-                      }`}
-                    >
+                    <span className={`px-2 py-0.5 rounded text-xs font-semibold ${STATUS_STYLE[b.paymentStatus || "PENDING"]}`}>
                       {b.paymentStatus || "PENDING"}
                     </span>
                   </td>
-
-                  {/* ACTION */}
-                  <td className="p-3">
-                    {role === "PATIENT" &&
-                      b.paymentStatus === "PENDING" &&
-                      b.appointmentId && (
-                        <button
-                          disabled={paying === b.id}
-                          onClick={() => handlePay(b)}
-                          className="bg-teal-600 text-white px-3 py-1 rounded text-xs hover:bg-teal-700 disabled:opacity-50"
-                        >
-                          {paying === b.id ? "Processing..." : "Pay"}
-                        </button>
-                      )}
+                  <td className="p-3 text-right">
+                    {role === "PATIENT" && b.paymentStatus === "PENDING" && b.appointmentId && (
+                      <button
+                        disabled={paying === b.id}
+                        onClick={() => handlePay(b)}
+                        className="bg-teal-600 text-white px-4 py-1.5 rounded-md text-xs font-medium hover:bg-teal-700 disabled:opacity-50 transition"
+                      >
+                        {paying === b.id ? "Processing..." : "Pay Now"}
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
             </tbody>
-
           </table>
         </div>
       )}
