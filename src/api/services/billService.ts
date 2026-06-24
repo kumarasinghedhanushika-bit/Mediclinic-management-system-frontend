@@ -17,4 +17,5 @@ export const billService = {
 
   create: (body: Bill) =>
     unwrap(API.post<ApiResponse<Bill>>("/bills", body)),
+  
 };

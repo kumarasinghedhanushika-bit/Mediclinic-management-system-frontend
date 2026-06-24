@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { billService, patientService, paymentService } from "../../../api";
+import { billService, patientService, paymentService, appointmentService } from "../../../api";
 import type { Bill, Role, User } from "../../../types";
 import { redirectToPayHere } from "../../../utils/payhere";
 
@@ -16,21 +16,37 @@ interface Props {
   user?: User | null;
 }
 
+interface NewBillForm {
+  appointmentId: string;
+  patientId: string;
+  appointmentNumber: string;
+  patientName: string;
+  consultationFee: number;
+  hospitalCharge: number;
+  description: string;
+  currency: string;
+}
+
+const EMPTY_BILL: NewBillForm = {
+  appointmentId: "",
+  patientId: "",
+  appointmentNumber: "",
+  patientName: "",
+  consultationFee: 0,
+  hospitalCharge: 0,
+  description: "Consultation fee",
+  currency: "LKR",
+};
+
 export default function Bills({ role, user }: Props) {
   const [bills, setBills] = useState<Bill[]>([]);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [lookingUp, setLookingUp] = useState(false);
 
-  const [newBill, setNewBill] = useState({
-    patientId: "",
-    appointmentId: "",
-    amount: 0,
-    description: "Consultation fee",
-    currency: "LKR",
-  });
+  const [newBill, setNewBill] = useState<NewBillForm>(EMPTY_BILL);
 
-  // LOAD BILLS
   const load = async () => {
     setLoading(true);
     try {
@@ -49,20 +65,16 @@ export default function Bills({ role, user }: Props) {
     }
   };
 
-  // Run on component mount and whenever role/user dynamically resolves
   useEffect(() => {
     if (role && user?.id) {
       load();
     }
   }, [role, user?.id]);
 
-  // PAY NOW (PAYHERE)
   const handlePay = async (bill: Bill) => {
-    console.log("Bill => ", bill);
     if (!bill.appointmentId || !bill.amount) {
       return toast.error("Invalid bill");
     }
-
     try {
       setPaying(bill.id);
       const res = await paymentService.checkout(
@@ -78,29 +90,76 @@ export default function Bills({ role, user }: Props) {
     }
   };
 
-  // CREATE BILL (ADMIN/RECEPTIONIST)
+  // AUTO-FILL: when the appointment ID changes, fetch the appointment
+  // and pull patient + consultation fee straight from it.
+  // AUTO-FILL: when the appointment ID changes, fetch the appointment
+  // and pull patient + consultation fee straight from it.
+  const handleAppointmentIdChange = async (appointmentId: string) => {
+    setNewBill((prev) => ({ ...prev, appointmentId }));
+
+    if (!appointmentId.trim()) {
+      setNewBill((prev) => ({
+        ...prev,
+        patientId: "",
+        appointmentNumber: "",
+        patientName: "",
+        consultationFee: 0,
+      }));
+      return;
+    }
+
+    try {
+      setLookingUp(true);
+      const appt = await appointmentService.getByNumber(appointmentId.trim());
+      console.log("appppp", appt);
+      setNewBill((prev) => ({
+        ...prev,
+        patientId: appt.patientId ?? "",
+        appointmentNumber: appt.appointmentNumber ?? "",
+        patientName: appt.patientName ?? "",
+        consultationFee: appt.consultationFee ?? 0,
+      }));
+    } catch {
+      setNewBill((prev) => ({
+        ...prev,
+        patientId: "",
+        appointmentNumber: "",
+        patientName: "",
+        consultationFee: 0,
+      }));
+      toast.error("Appointment not found");
+    } finally {
+      setLookingUp(false);
+    }
+  };
+
   const handleCreateBill = async () => {
-    if (!newBill.patientId || !newBill.appointmentId || newBill.amount <= 0) {
-      return toast.error("Please fill all fields correctly");
+    if (!newBill.appointmentId || !newBill.patientId) {
+      return toast.error("Enter a valid Appointment ID first");
+    }
+    if (newBill.consultationFee <= 0 && newBill.hospitalCharge <= 0) {
+      return toast.error("Bill amount must be greater than 0");
     }
     try {
-      await billService.create(newBill as Bill);
+      await billService.create({
+        appointmentId: newBill.appointmentId,
+        patientId: newBill.patientId,
+        consultationFee: newBill.consultationFee,
+        hospitalCharge: newBill.hospitalCharge,
+        description: newBill.description,
+        currency: newBill.currency,
+      } as Bill);
       toast.success("Bill created");
       setShowCreate(false);
-      setNewBill({
-        patientId: "",
-        appointmentId: "",
-        amount: 0,
-        description: "Consultation fee",
-        currency: "LKR",
-      });
+      setNewBill(EMPTY_BILL);
       load();
-    } catch {
-      toast.error("Failed to create bill");
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to create bill");
     }
   };
 
   const canCreate = role === "ADMIN" || role === "RECEPTIONIST";
+  const totalAmount = (newBill.consultationFee || 0) + (newBill.hospitalCharge || 0);
 
   if (loading) {
     return (
@@ -112,7 +171,6 @@ export default function Bills({ role, user }: Props) {
 
   return (
     <div className="p-4 space-y-6">
-      {/* HEADER */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-slate-800">
           {role === "PATIENT" ? "My Bills" : "Billing Management"}
@@ -128,34 +186,79 @@ export default function Bills({ role, user }: Props) {
         )}
       </div>
 
-      {/* CREATE BILL FORM */}
       {showCreate && canCreate && (
         <div className="bg-white border rounded-xl p-4 space-y-3 shadow-sm max-w-md">
-          <input
-            className="w-full border p-2 rounded text-sm focus:outline-teal-600"
-            placeholder="Patient ID"
-            value={newBill.patientId}
-            onChange={(e) => setNewBill({ ...newBill, patientId: e.target.value })}
-          />
-          <input
-            className="w-full border p-2 rounded text-sm focus:outline-teal-600"
-            placeholder="Appointment ID"
-            value={newBill.appointmentId}
-            onChange={(e) => setNewBill({ ...newBill, appointmentId: e.target.value })}
-          />
-          <input
-            type="number"
-            className="w-full border p-2 rounded text-sm focus:outline-teal-600"
-            placeholder="Amount"
-            value={newBill.amount || ""}
-            onChange={(e) => setNewBill({ ...newBill, amount: Number(e.target.value) })}
-          />
-          <input
-            className="w-full border p-2 rounded text-sm focus:outline-teal-600"
-            placeholder="Description"
-            value={newBill.description}
-            onChange={(e) => setNewBill({ ...newBill, description: e.target.value })}
-          />
+          <div>
+            <label className="text-xs text-gray-500">Appointment ID</label>
+            <input
+              className="w-full border p-2 rounded text-sm focus:outline-teal-600"
+              placeholder="Paste appointment ID"
+              value={newBill.appointmentId}
+              onChange={(e) => handleAppointmentIdChange(e.target.value)}
+            />
+          </div>
+
+          {lookingUp && (
+            <p className="text-xs text-gray-400">Looking up appointment...</p>
+          )}
+
+          <div>
+            <label className="text-xs text-gray-500">Appointment No.</label>
+            <input
+              className="w-full border p-2 rounded text-sm bg-gray-50 text-gray-500"
+              value={newBill.appointmentNumber}
+              disabled
+              placeholder="Auto-filled"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs text-gray-500">Patient</label>
+            <input
+              className="w-full border p-2 rounded text-sm bg-gray-50 text-gray-500"
+              value={newBill.patientName}
+              disabled
+              placeholder="Auto-filled"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs text-gray-500">Consultation Fee</label>
+            <input
+              type="number"
+              className="w-full border p-2 rounded text-sm bg-gray-50 text-gray-500"
+              value={newBill.consultationFee}
+              disabled
+            />
+          </div>
+
+          <div>
+            <label className="text-xs text-gray-500">Hospital Charge</label>
+            <input
+              type="number"
+              className="w-full border p-2 rounded text-sm focus:outline-teal-600"
+              placeholder="0.00"
+              value={newBill.hospitalCharge || ""}
+              onChange={(e) =>
+                setNewBill({ ...newBill, hospitalCharge: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <label className="text-xs text-gray-500">Description</label>
+            <input
+              className="w-full border p-2 rounded text-sm focus:outline-teal-600"
+              value={newBill.description}
+              onChange={(e) => setNewBill({ ...newBill, description: e.target.value })}
+            />
+          </div>
+
+          <div className="flex justify-between text-sm font-medium pt-1">
+            <span>Total</span>
+            <span>{newBill.currency} {totalAmount.toFixed(2)}</span>
+          </div>
+
           <button
             onClick={handleCreateBill}
             className="w-full bg-teal-600 text-white py-2 rounded text-sm font-medium hover:bg-teal-700 transition"
@@ -165,7 +268,6 @@ export default function Bills({ role, user }: Props) {
         </div>
       )}
 
-      {/* BILLS TABLE */}
       {bills.length === 0 ? (
         <div className="text-center text-gray-400 py-10 border rounded-xl bg-gray-50/50">
           No bills found
@@ -175,7 +277,7 @@ export default function Bills({ role, user }: Props) {
           <table className="w-full text-sm text-left">
             <thead className="bg-gray-50 border-b text-gray-600">
               <tr>
-                <th className="p-3 font-medium">Order ID</th>
+                <th className="p-3 font-medium">Appointment No.</th>
                 <th className="p-3 font-medium">Description</th>
                 <th className="p-3 font-medium">Amount</th>
                 <th className="p-3 font-medium">Status</th>
@@ -186,7 +288,7 @@ export default function Bills({ role, user }: Props) {
               {bills.map((b) => (
                 <tr key={b.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="p-3 font-mono text-xs text-slate-500">
-                    {b.orderId || b.id.slice(-6)}
+                    {b.appointmentNumber || b.orderId || b.id.slice(-6)}
                   </td>
                   <td className="p-3">{b.description || "Consultation"}</td>
                   <td className="p-3 font-medium">
