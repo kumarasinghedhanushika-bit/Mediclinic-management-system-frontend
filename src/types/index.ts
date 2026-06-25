@@ -105,15 +105,17 @@ export interface Appointment {
 export interface Bill {
   id: string;
   orderId?: string;
-  patientId?: string;
+  patientId: string;
   appointmentId?: string;
-  amount?: number;
-  currency?: string;
+  appointmentNumber?: string;
+  patientNumber?: string;
+  patientName?: string;
+  consultationFee?: number;
+  hospitalCharge?: number;
+  amount: number;
+  currency: string;
   description?: string;
-  items?: string;
-  paymentStatus?: PaymentStatus;
-  createdAt?: string;
-  paidAt?: string;
+  paymentStatus?: string;
 }
 
 export interface PharmacyMedicine {

@@ -69,6 +69,13 @@ export const appointmentService = {
       API.put<ApiResponse<Appointment>>(`/appointments/${id}/reschedule`, body)
     ),
 
+    getByNumber: (appointmentNumber: string) =>
+  unwrap(
+    API.get<ApiResponse<Appointment>>(
+      `/appointments/number/${appointmentNumber}`
+    )
+  ),
+
   confirm: (id: string) =>
     unwrap(API.put<ApiResponse<Appointment>>(`/appointments/${id}/confirm`)),
 
